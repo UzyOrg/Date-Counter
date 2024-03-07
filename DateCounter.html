@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="contador">La promoción aún no ha empezado</div>
+    <script>
+      const fecha1 = new Date("March 7, 2024 18:00:00 GMT-0600").toLocaleString(
+        "en-US",
+        {
+          timeZone: "America/Mexico_City",
+        }
+      );
+      primeraFechaLimite = new Date(fecha1);
+      console.log(primeraFechaLimite);
+
+      const fecha2 = new Date("March 7, 2024 20:00:00 GMT-0600").toLocaleString(
+        "en-US",
+        {
+          timeZone: "America/Mexico_City",
+        }
+      );
+      segundaFechaLimite = new Date(fecha2);
+
+      function actualizarContador() {
+        const ahoraEnMexico = new Date().toLocaleString("en-US", {
+          timeZone: "America/Mexico_City",
+        });
+        let horaGMT6 = new Date(ahoraEnMexico);
+        let texto = "";
+        let fechaLimite;
+
+        if (horaGMT6 < primeraFechaLimite) {
+          texto = "La promoción casi ha empezado";
+          fechaLimite = primeraFechaLimite;
+        } else if (horaGMT6 < segundaFechaLimite) {
+          texto = "La promoción ha empezado";
+          fechaLimite = segundaFechaLimite;
+        } else {
+          texto = "La promoción ha acabado";
+          document.getElementById(
+            "contador"
+          ).innerHTML = `<p class="texto">${texto}</p>`;
+          return;
+        }
+
+        const tiempoRestante = obtenerTiempoRestante(horaGMT6, fechaLimite);
+        document.getElementById(
+          "contador"
+        ).innerHTML = `<p class="texto">${texto}</p><div class="contador">${formatoTiempo(
+          tiempoRestante
+        )}</div>`;
+
+        if (horaGMT6 >= fechaLimite) {
+          clearInterval(intervalo);
+        }
+      }
+
+      function obtenerTiempoRestante(ahora, fechaLimite) {
+        const diferencia = fechaLimite - new Date(ahora);
+        return {
+          dias: Math.floor(diferencia / (1000 * 60 * 60 * 24)),
+          horas: Math.floor(
+            (diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          ),
+          minutos: Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60)),
+          segundos: Math.floor((diferencia % (1000 * 60)) / 1000),
+        };
+      }
+
+      function formatoTiempo(tiempo) {
+        return `<div class="counter-time"><p>${tiempo.dias
+          .toString()
+          .padStart(
+            2,
+            "0"
+          )}</p><p class="temporalidad"> días</p></div> : <div class="counter-time"><p>${tiempo.horas
+          .toString()
+          .padStart(
+            2,
+            "0"
+          )}</p><p class="temporalidad"> horas</p> </div>: <div class="counter-time"><p>${tiempo.minutos
+          .toString()
+          .padStart(
+            2,
+            "0"
+          )}</p><p class="temporalidad"> minutos</p></div> : <div class="counter-time"><p>${tiempo.segundos
+          .toString()
+          .padStart(2, "0")}</p><p class="temporalidad"> segundos</p></div>`;
+      }
+
+      // Actualizar el contador cada segundo
+      const intervalo = setInterval(actualizarContador, 1000);
+
+      // Actualizar el contador al cargar la página
+      actualizarContador();
+    </script>
+  </body>
+</html>
